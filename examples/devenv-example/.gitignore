@@ -1,0 +1,4 @@
+flake.lock
+.mcp.json
+.dir-locals.el
+.devenv
