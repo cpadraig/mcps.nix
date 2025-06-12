@@ -84,6 +84,49 @@ let
       };
     };
 
+    grafana = {
+      name = "Grafana";
+      command = tools.getToolPath "grafana";
+      args = config:
+        [ "-enabled-tools" (builtins.concatStringsSep "," config.toolsets) ] ++
+        (lib.optionals config.debug ["-debug"]);
+
+      env = config: {
+        GRAFANA_URL = config.baseURL;
+        GRAFANA_API_KEY_FILEPATH = config.apiKeyFilepath;
+      };
+
+      options = {
+        apiKeyFilepath = mkOption {
+          type = types.str;
+          description = lib.mdDoc "File containing Grafana API key";
+          example = "/var/run/agenix/grafana-api.key";
+        };
+
+        baseURL = mkOption {
+          type = types.str;
+          description = lib.mdDoc "URL where the Grafana host lives";
+          example = "https://localhost:3000";
+        };
+
+        toolsets = mkOption {
+          type = types.listOf (types.enum [
+            "search" "datasource" "incident" "prometheus"
+            "loki" "alerting" "dashboard" "oncall" "asserts"
+            "sift" "admin"
+          ]);
+          default = ["prometheus" "search" "datasource"];
+          description = lib.mdDoc "List of Grafana toolsets to enable";
+        };
+
+        debug = mkOption {
+          type = types.bool;
+          description = lib.mdDoc "Enable debug mode for the Grafana transport";
+          default = false;
+          example = "true";
+        };
+      };
+    };
   };
 
 in

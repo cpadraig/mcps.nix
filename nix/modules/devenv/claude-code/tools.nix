@@ -60,9 +60,12 @@ let
       binary = "github-mcp-server";
     };
 
-    gdrive = mkTool {
-      package = pkgs.mcp-servers;
-      binary = "mcp-server-gdrive";
+    grafana = mkTool {
+      package = wrapWithCredentialFiles {
+        package = pkgs.mcp-grafana;
+        credentialEnvs = [ "GRAFANA_API_KEY" ];
+      };
+      binary = "mcp-grafana";
     };
 
   };
