@@ -1,7 +1,7 @@
 { pkgs, lib, inputs, extraTools ? {} }:
 
 let
-  wrapWithCredentialFiles = pkgs.callPackage ../../../lib/wrapWithCredentialFiles.nix {};
+  wrapWithCredentialFiles = pkgs.callPackage ./nix/lib/wrapWithCredentialFiles.nix {};
 
   mkTool = { package, binary }:
     {

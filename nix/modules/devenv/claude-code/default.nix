@@ -15,7 +15,7 @@ let
   # ----------------------
   # Tools Management
   # ----------------------
-  baseTools = import ./tools.nix { inherit pkgs inputs lib; };
+  baseTools = import ../../../../tools.nix { inherit pkgs inputs lib; };
   extendedTools = baseTools.extend (cfg.extraTools or {});
 
   presetRequiredTools = lib.unique (lib.flatten (
@@ -29,8 +29,8 @@ let
   # ----------------------
   # Preset Management
   # ----------------------
-  mcpServerOptionsType = import ./mcp-server-options.nix lib;
-  presetDefinitions = import ./presets.nix { inherit config lib; tools = extendedTools; };
+  mcpServerOptionsType = import ../../../../mcp-server-options.nix lib;
+  presetDefinitions = import ../../../../presets.nix { inherit config lib; tools = extendedTools; };
   
   presetOptionTypes = lib.mapAttrs (name: preset: 
     lib.mkOption {
