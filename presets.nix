@@ -109,6 +109,22 @@ let
       command = tools.getToolPath "sequential-thinking";
     };
 
+    time = {
+      name = "Time";
+      command = tools.getToolPath "time";
+      args = config:
+        lib.optionals (config.localTimezone != null)
+          [ "--local-timezone" config.localTimezone ];
+
+      options = {
+        localTimezone = mkOption {
+          type = types.str;
+          description = lib.mdDoc "Timezone used by the server";
+          example = "America/New_York";
+        };
+      };
+    };
+
     github = {
       name = "GitHub";
       command = tools.getToolPath "github";

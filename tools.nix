@@ -88,6 +88,11 @@ let
       binary = "mcp-server-sequentialthinking";
     };
 
+    time = mkTool {
+      package = pkgs.mcp-servers;
+      binary = "mcp-server-time";
+    };
+
   };
 
   # Combined tools (base + extra)
