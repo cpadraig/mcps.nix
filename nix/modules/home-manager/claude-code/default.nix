@@ -55,27 +55,24 @@ let
     }
 
     echo "Synchronizing MCP servers configuration..."
-    echo 
 
     # Remove all existing MCP servers
     while has_mcp_servers; do
       echo "Removing existing MCP servers..."
       for server in $(get_server_list); do
-        echo " - Removing $server"
-        ${cfg.package}/bin/claude mcp remove --scope user "$server"
+        ${cfg.package}/bin/claude mcp remove --scope user "$server" > /dev/null
       done
     done
 
-    echo
     echo "Installing configured MCP servers..."
 
     # Install new MCP server configurations
     ${lib.concatStrings (lib.mapAttrsToList (name: value: ''
-      echo " - Installing ${name}"
-        ${cfg.package}/bin/claude mcp add-json --scope user "${name}" '${builtins.toJSON value}'
+      printf " - Installing ${name} "
+      if ${cfg.package}/bin/claude mcp add-json --scope user "${name}" '${builtins.toJSON value}' > /dev/null 2>&1; then
+        printf "✅\n"
+      fi
       '') allServerConfigs)}
-
-    echo
     echo "MCP servers synchronization completed!"
   '';
 
