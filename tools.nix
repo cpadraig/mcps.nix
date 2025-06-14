@@ -78,6 +78,11 @@ let
       binary = "mcp-server-git";
     };
 
+    fetch = mkTool {
+      package = pkgs.mcp-servers;
+      binary = "mcp-server-fetch";
+    };
+
   };
 
   # Combined tools (base + extra)

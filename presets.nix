@@ -75,6 +75,35 @@ let
       };
     };
 
+    fetch = {
+      name = "Fetch";
+      command = tools.getToolPath "fetch";
+      args = config:
+        (lib.optionals (config.userAgent != null) ["--user-agent" config.userAgent]) ++
+        (lib.optionals (config.proxyURL != null) ["--proxy-url" config.proxyURL]) ++
+        (lib.optionals config.ignoreRobotsTxt ["--ignore-robots-txt"]);
+      options = {
+        proxyURL = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = lib.mdDoc "Proxy URL to use for requests";
+          example = "https://localhost:3000";
+        };
+        ignoreRobotsTxt = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "Ignore robots.txt restrictions";
+          example = false;
+        };
+        userAgent = mkOption {
+          type = types.nullOr types.str;
+          description = lib.mdDoc "Custom User-Agent string";
+          default = null;
+          example = "claude-code";
+        };
+      };
+    };
+
     github = {
       name = "GitHub";
       command = tools.getToolPath "github";
