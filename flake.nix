@@ -64,14 +64,23 @@
           };
 
           devenv.shells.default =
-            { pkgs, ... }:
+            { pkgs, config, ... }:
             {
-              packages = [ pkgs.claude-code ];
+              imports = [ inputs.self.devenvModules.claude-code ];
+
               git-hooks.hooks = {
                 nixfmt-rfc-style.enable = true;
               };
-            };
 
+              claude-code = {
+                enable = true;
+                mcp.lsp-nix = {
+                  enable = true;
+                  workspace = config.devenv.root;
+                };
+              };
+
+            };
         };
     };
 }
