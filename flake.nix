@@ -61,6 +61,7 @@
           overlayAttrs = config.packages // {
             # Add necessary inputs to build packages from this flake.
             inherit (inputs) uv2nix pyproject pyproject-build-systems;
+            inherit (inputs.self.packages.${system}) claude-code;
           };
 
           devenv.shells.default =
