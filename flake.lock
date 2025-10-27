@@ -447,11 +447,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1761087298,
-        "narHash": "sha256-Ei1coKUscX4X7ldeyAdQj13FEvdUI4wjqQD/1uROtN8=",
+        "lastModified": 1761593970,
+        "narHash": "sha256-jb3/uO8jrva5uZ8QQiv5wZ+PJGqAZTix0KD+zYnpK7M=",
         "owner": "roman",
         "repo": "nixDir",
-        "rev": "e175072ad441b29703d982c083a34c2d9f0ca243",
+        "rev": "3d6dcccde4a8f0bb929e9ced8eb156fa0d9af1b1",
         "type": "github"
       },
       "original": {
