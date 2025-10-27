@@ -41,36 +41,32 @@
       imports = [
         inputs.devenv.flakeModule
         inputs.nixDir.flakeModule
-        inputs.flake-parts.flakeModules.easyOverlay
       ];
 
       nixDir = {
         root = ./.;
         enable = true;
+        nixpkgsConfig = {
+          allowUnfree = true;
+        };
+        installOverlays = [
+          (
+            _final: prev:
+            let
+              unstable-pkgs = import inputs.nixpkgs-unstable { inherit (prev) system; };
+            in
+            {
+              inherit (inputs) uv2nix pyproject pyproject-build-systems;
+              inherit (unstable-pkgs) github-mcp-server;
+            }
+          )
+        ];
+        generateAllPackage = true;
       };
 
       perSystem =
         { system, config, ... }:
         {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-            overlays = [ inputs.self.overlays.default ];
-          };
-
-          # overlayAttrs builds the default overlay.
-          overlayAttrs =
-            let
-              unstable-pkgs = import inputs.nixpkgs-unstable { inherit system; };
-            in
-            config.packages
-            // {
-              # Add necessary inputs to build packages from this flake.
-              inherit (inputs) uv2nix pyproject pyproject-build-systems;
-              inherit (inputs.self.packages.${system}) claude-code;
-              inherit (unstable-pkgs) github-mcp-server;
-            };
-
           devenv.shells.default =
             { pkgs, config, ... }:
             {
