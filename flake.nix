@@ -136,6 +136,15 @@
                 mainProgram = "mcp-nixos";
               };
             };
+
+            # Expose all MCP packages from nix/packages/
+            mcp-servers = final.callPackage ./nix/packages/mcp-servers { };
+            mcp-language-server = final.callPackage ./nix/packages/mcp-language-server { };
+            ast-grep-mcp = final.callPackage ./nix/packages/ast-grep-mcp { };
+            mcp-grafana = final.callPackage ./nix/packages/mcp-grafana { };
+            mcp-obsidian = final.callPackage ./nix/packages/mcp-obsidian { };
+            buildkite-mcp-server = final.callPackage ./nix/packages/buildkite-mcp-server { };
+            mcp-server-asana = final.callPackage ./nix/packages/mcp-server-asana { };
           };
       };
 
