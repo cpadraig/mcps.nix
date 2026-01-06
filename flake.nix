@@ -76,16 +76,13 @@
 
       flake.overlays = {
         default =
-          _final: prev:
+          final: prev:
           let
             unstable-pkgs = import inputs.nixpkgs-unstable { inherit (prev) system; };
-          in
-          {
-            inherit (inputs) uv2nix pyproject pyproject-build-systems;
-            inherit (unstable-pkgs) github-mcp-server;
 
-            # Override python3 to use newer fastmcp that supports mcp 1.25.0
-            python3 = prev.python3.override {
+            # Python with patched fastmcp for mcp 1.25.0 compatibility
+            patchedPython3 = prev.python3.override {
+              self = patchedPython3;
               packageOverrides = pyfinal: pyprev: {
                 fastmcp = pyprev.fastmcp.overridePythonAttrs (old: rec {
                   version = "2.14.2";
@@ -98,7 +95,39 @@
                 });
               };
             };
-            python3Packages = prev.python3.pkgs;
+          in
+          {
+            inherit (inputs) uv2nix pyproject pyproject-build-systems;
+            inherit (unstable-pkgs) github-mcp-server;
+
+            python3 = patchedPython3;
+            python3Packages = patchedPython3.pkgs;
+
+            # Build mcp-nixos with patched python3
+            mcp-nixos = patchedPython3.pkgs.buildPythonApplication {
+              pname = "mcp-nixos";
+              version = "1.1.0";
+              pyproject = true;
+
+              src = inputs.mcp-nixos;
+
+              build-system = [ patchedPython3.pkgs.hatchling ];
+
+              dependencies = with patchedPython3.pkgs; [
+                fastmcp
+                requests
+                beautifulsoup4
+              ];
+
+              dontCheckRuntimeDeps = true;
+              pythonImportsCheck = [ ];
+              doCheck = false;
+
+              meta = {
+                description = "MCP server for NixOS";
+                mainProgram = "mcp-nixos";
+              };
+            };
           };
       };
 
