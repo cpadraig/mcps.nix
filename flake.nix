@@ -92,6 +92,8 @@
                     rev = "v${version}";
                     hash = "sha256-JqDsHmhuRom4CPmQd0sMaBtgypHDtwVJ4I3fnOLjnd8=";
                   };
+                  # Skip runtime deps check - new deps not in nixpkgs yet
+                  dontCheckRuntimeDeps = true;
                 });
               };
             };
