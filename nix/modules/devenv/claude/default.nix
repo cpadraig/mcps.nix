@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -21,8 +22,7 @@ let
   # Tools Management
   # ----------------------
   baseTools = import ../../../../tools.nix {
-    inherit pkgs lib;
-    inputs = { };
+    inherit pkgs lib inputs;
   };
 
   # ----------------------
