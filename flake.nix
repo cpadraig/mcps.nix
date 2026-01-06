@@ -92,7 +92,11 @@
                     rev = "v${version}";
                     hash = "sha256-JqDsHmhuRom4CPmQd0sMaBtgypHDtwVJ4I3fnOLjnd8=";
                   };
-                  # Skip checks - new deps (platformdirs, etc.) not in nixpkgs yet
+                  # Add new deps required by 2.14.2
+                  dependencies = (old.dependencies or [ ]) ++ [
+                    pyfinal.platformdirs
+                  ];
+                  # Skip checks for deps not in nixpkgs (py-key-value-aio, pydocket)
                   dontCheckRuntimeDeps = true;
                   pythonImportsCheck = [ ];
                   doCheck = false;
