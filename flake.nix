@@ -17,7 +17,7 @@
     # Used to run integration tests with nixosTest
     # mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
 
-    mcp-nixos.url = "github:utensils/mcp-nixos/v1.0.3";
+    mcp-nixos.url = "github:utensils/mcp-nixos/v1.1.0";
     mcp-nixos.inputs.nixpkgs.follows = "nixpkgs";
 
     devenv.url = "github:cachix/devenv";
@@ -83,6 +83,22 @@
           {
             inherit (inputs) uv2nix pyproject pyproject-build-systems;
             inherit (unstable-pkgs) github-mcp-server;
+
+            # Override python3 to use newer fastmcp that supports mcp 1.25.0
+            python3 = prev.python3.override {
+              packageOverrides = pyfinal: pyprev: {
+                fastmcp = pyprev.fastmcp.overridePythonAttrs (old: rec {
+                  version = "2.14.2";
+                  src = prev.fetchFromGitHub {
+                    owner = "jlowin";
+                    repo = "fastmcp";
+                    rev = "v${version}";
+                    hash = "sha256-JqDsHmhuRom4CPmQd0sMaBtgypHDtwVJ4I3fnOLjnd8=";
+                  };
+                });
+              };
+            };
+            python3Packages = prev.python3.pkgs;
           };
       };
 
