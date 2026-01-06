@@ -84,6 +84,61 @@
             patchedPython3 = prev.python3.override {
               self = patchedPython3;
               packageOverrides = pyfinal: pyprev: {
+                # Package py-key-value-aio (dependency of pydocket) - use wheel
+                py-key-value-aio = pyfinal.buildPythonPackage rec {
+                  pname = "py_key_value_aio";
+                  version = "0.3.0";
+                  format = "wheel";
+
+                  src = prev.fetchPypi {
+                    inherit pname version;
+                    format = "wheel";
+                    dist = "py3";
+                    python = "py3";
+                    hash = "sha256-HHgZFXZgeL/WCNqnaf77l+ZdHXN0aj37ZARg4yIHG2Q=";
+                  };
+
+                  dependencies = with pyfinal; [
+                    redis
+                  ];
+
+                  pythonImportsCheck = [ ];
+                  doCheck = false;
+                  dontCheckRuntimeDeps = true;
+                };
+
+                # Package pydocket (imports as 'docket') - use wheel
+                pydocket = pyfinal.buildPythonPackage rec {
+                  pname = "pydocket";
+                  version = "0.16.3";
+                  format = "wheel";
+
+                  src = prev.fetchPypi {
+                    inherit pname version;
+                    format = "wheel";
+                    dist = "py3";
+                    python = "py3";
+                    hash = "sha256-4rUJJTVufNU1KGJVGVRYrHu6FfJSkzVmUbNtIj213Xw=";
+                  };
+
+                  dependencies = with pyfinal; [
+                    cloudpickle
+                    fakeredis
+                    opentelemetry-api
+                    prometheus-client
+                    pyfinal.py-key-value-aio
+                    python-json-logger
+                    redis
+                    rich
+                    typer
+                    typing-extensions
+                  ];
+
+                  pythonImportsCheck = [ ];
+                  doCheck = false;
+                  dontCheckRuntimeDeps = true;
+                };
+
                 fastmcp = pyprev.fastmcp.overridePythonAttrs (old: rec {
                   version = "2.14.2";
                   src = prev.fetchFromGitHub {
@@ -95,8 +150,8 @@
                   # Add new deps required by 2.14.2
                   dependencies = (old.dependencies or [ ]) ++ [
                     pyfinal.platformdirs
+                    pyfinal.pydocket
                   ];
-                  # Skip checks for deps not in nixpkgs (py-key-value-aio, pydocket)
                   dontCheckRuntimeDeps = true;
                   pythonImportsCheck = [ ];
                   doCheck = false;
