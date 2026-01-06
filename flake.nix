@@ -81,6 +81,28 @@
           patchedPython3 = prev.python3.override {
             self = patchedPython3;
             packageOverrides = pyfinal: pyprev: {
+              # 1. Add the missing shared package
+              py-key-value-shared = pyfinal.buildPythonPackage rec {
+                pname = "py_key_value_shared";
+                version = "0.3.0"; # Match the version of py-key-value-aio
+                format = "wheel";
+
+                src = prev.fetchPypi {
+                  inherit pname version;
+                  format = "wheel";
+                  dist = "py3";
+                  python = "py3";
+                  # You will need to calculate this hash or use lib.fakeHash initially
+                  hash = "sha256-164j5zs883ac9bi2rh9g1ksbhc3xy31az4qyicavn26axfkzn3jv=";
+                };
+
+                dependencies = with pyfinal; [
+                  beartype
+                ];
+
+                doCheck = false;
+                dontCheckRuntimeDeps = true;
+              };
               # Package py-key-value-aio (dependency of pydocket) - use wheel
               py-key-value-aio = pyfinal.buildPythonPackage rec {
                 pname = "py_key_value_aio";
@@ -98,6 +120,7 @@
                 dependencies = with pyfinal; [
                   redis
                   beartype
+                  py-key-value-shared
                 ];
 
                 pythonImportsCheck = [];
