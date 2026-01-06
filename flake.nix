@@ -97,6 +97,7 @@
 
                 dependencies = with pyfinal; [
                   redis
+                  beartype
                 ];
 
                 pythonImportsCheck = [];
@@ -220,10 +221,7 @@
           };
         };
 
-        devenv.shells.default = {
-          config,
-          ...
-        }: {
+        devenv.shells.default = {config, ...}: {
           imports = [inputs.self.devenvModules.claude];
 
           git-hooks.hooks = {
