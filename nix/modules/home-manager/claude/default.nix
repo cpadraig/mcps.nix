@@ -56,18 +56,16 @@ in
     type = types.submodule {
       imports = [
         (
-          (
-            { config, ... }:
-            {
-              options = presetOptionTypes // {
-                servers = mkOption {
-                  type = types.attrsOf (types.submodule mcpServerOptionsType);
-                  default = { };
-                  description = lib.mdDoc "Custom MCP server configurations";
-                };
+          _:
+          {
+            options = presetOptionTypes // {
+              servers = mkOption {
+                type = types.attrsOf (types.submodule mcpServerOptionsType);
+                default = { };
+                description = lib.mdDoc "Custom MCP server configurations";
               };
-            }
-          )
+            };
+          }
         )
       ];
     };

@@ -136,8 +136,25 @@ let
     };
 
     nixos = mkTool {
-      package = inputs.mcp-nixos.packages.${pkgs.system}.default;
+      # Use pkgs.mcp-nixos from overlay instead of inputs.mcp-nixos.packages
+      # to get the patched fastmcp with mcp 1.25.0 support
+      package = pkgs.mcp-nixos or inputs.mcp-nixos.packages.${pkgs.system}.default;
       binary = "mcp-nixos";
+    };
+
+    config-normalizer = mkTool {
+      package = pkgs.config-normalizer;
+      binary = "config-normalizer";
+    };
+
+    flake-analyst = mkTool {
+      package = pkgs.flake-analyst;
+      binary = "flake-analyst";
+    };
+
+    code-intel = mkTool {
+      package = pkgs.code-intel;
+      binary = "code-intel";
     };
 
   };

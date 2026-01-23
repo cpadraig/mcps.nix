@@ -33,7 +33,7 @@ manual JSON configuration.
 
 ## Quick Start
 
-Add this flake's overlay to your nixpkgs import.
+Add this flake's overlay to your nixpkgs import:
 
 ```nix
 let
@@ -42,6 +42,47 @@ let
   };
 in
 # ...
+```
+
+## Flake Outputs
+
+This flake provides the following outputs for easy consumption:
+
+### Module Outputs
+- `homeManagerModules.claude` - Native Home Manager integration 
+- `homeManagerModules.claude-install` - Alternative CLI-based Home Manager integration
+- `homeManagerModules.opencode` - OpenCode Home Manager integration
+- `devenvModules.claude` - Devenv integration
+
+### Package Outputs  
+- `packages` - Direct access to all MCP server packages
+- `lib` - Utility functions for tools, presets, and credential management
+
+### Template Outputs
+- `templates` - Ready-to-use flake templates for different scenarios
+
+## Templates
+
+This flake now includes comprehensive templates for quick setup:
+
+### Basic Home Manager Setup
+```bash
+nix flake init -t mcps.nix#basic-home-manager
+```
+
+### Comprehensive Home Manager Setup  
+```bash
+nix flake init -t mcps.nix#comprehensive-home-manager
+```
+
+### Development Environment (Devenv)
+```bash
+nix flake init -t mcps.nix#devenv-setup
+```
+
+### NixOS Service Configuration
+```bash
+nix flake init -t mcps.nix#nixos-service
 ```
 
 ### Using with devenv
@@ -126,25 +167,26 @@ Uses the Claude CLI to manage MCP servers in `~/.claude.json`. This approach is 
 
 ### Built-in Presets
 
-| Preset | Description | Source |
-|--------|-------------|--------|
-| **asana** | Asana task management integration with API token support | [roychri/mcp-server-asana](https://github.com/roychri/mcp-server-asana) |
-| **ast-grep** | Structural code search and transformation using ast-grep patterns | [ast-grep/ast-grep-mcp](https://github.com/ast-grep/ast-grep-mcp) |
-| **buildkite** | Buildkite CI/CD pipeline integration and monitoring | [buildkite/buildkite-mcp-server](https://github.com/buildkite/buildkite-mcp-server) |
-| **fetch** | Web content fetching with proxy support and custom user agents | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
-| **filesystem** | Local filesystem access with configurable path restrictions | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
-| **git** | Git repository operations and version control | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
-| **github** | GitHub API integration with configurable toolsets (repos, issues, users, pull_requests, code_security) | [github/github-mcp-server](https://github.com/github/github-mcp-server) |
-| **grafana** | Grafana monitoring, alerting, and dashboard management with multiple toolsets | [grafana/mcp-grafana](https://github.com/grafana/mcp-grafana) |
-| **lsp-golang** | Language Server Protocol integration for Go development with configurable workspace | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) |
-| **lsp-nix** | Language Server Protocol integration for Nix development with configurable workspace | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) |
-| **lsp-python** | Language Server Protocol integration for Python development with configurable workspace | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) |
-| **lsp-rust** | Language Server Protocol integration for Rust development with configurable workspace | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) |
-| **lsp-typescript** | Language Server Protocol integration for TypeScript development with configurable workspace | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) |
-| **nixos** | NixOS and Home Manager configuration search, options lookup, and package discovery | [utensils/mcp-nixos](https://github.com/utensils/mcp-nixos) |
-| **obsidian** | Obsidian vault integration for notes and knowledge management | [MarkusPfundstein/mcp-obsidian](https://github.com/MarkusPfundstein/mcp-obsidian) |
-| **sequential-thinking** | Enhanced reasoning and knowledge graph capabilities | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
-| **time** | Time and timezone utilities with configurable local timezone | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
+
+| Preset                  | Description                                                                                            | Source                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| **asana**               | Asana task management integration with API token support                                               | [roychri/mcp-server-asana](https://github.com/roychri/mcp-server-asana)             |
+| **ast-grep**            | Structural code search and transformation using ast-grep patterns                                      | [ast-grep/ast-grep-mcp](https://github.com/ast-grep/ast-grep-mcp)                   |
+| **buildkite**           | Buildkite CI/CD pipeline integration and monitoring                                                    | [buildkite/buildkite-mcp-server](https://github.com/buildkite/buildkite-mcp-server) |
+| **fetch**               | Web content fetching with proxy support and custom user agents                                         | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)     |
+| **filesystem**          | Local filesystem access with configurable path restrictions                                            | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)     |
+| **git**                 | Git repository operations and version control                                                          | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)     |
+| **github**              | GitHub API integration with configurable toolsets (repos, issues, users, pull_requests, code_security) | [github/github-mcp-server](https://github.com/github/github-mcp-server)             |
+| **grafana**             | Grafana monitoring, alerting, and dashboard management with multiple toolsets                          | [grafana/mcp-grafana](https://github.com/grafana/mcp-grafana)                       |
+| **lsp-golang**          | Language Server Protocol integration for Go development with configurable workspace                    | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server)     |
+| **lsp-nix**             | Language Server Protocol integration for Nix development with configurable workspace                   | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server)     |
+| **lsp-python**          | Language Server Protocol integration for Python development with configurable workspace                | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server)     |
+| **lsp-rust**            | Language Server Protocol integration for Rust development with configurable workspace                  | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server)     |
+| **lsp-typescript**      | Language Server Protocol integration for TypeScript development with configurable workspace            | [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server)     |
+| **nixos**               | NixOS and Home Manager configuration search, options lookup, and package discovery                     | [utensils/mcp-nixos](https://github.com/utensils/mcp-nixos)                         |
+| **obsidian**            | Obsidian vault integration for notes and knowledge management                                          | [MarkusPfundstein/mcp-obsidian](https://github.com/MarkusPfundstein/mcp-obsidian)   |
+| **sequential-thinking** | Enhanced reasoning and knowledge graph capabilities                                                    | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)     |
+| **time**                | Time and timezone utilities with configurable local timezone                                           | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)     |
 
 ## Module Structure
 

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -21,8 +22,7 @@ let
   # Tools Management
   # ----------------------
   baseTools = import ../../../../tools.nix {
-    inherit pkgs lib;
-    inputs = { };
+    inherit pkgs lib inputs;
   };
 
   # ----------------------
@@ -58,18 +58,16 @@ in
     type = types.submodule {
       imports = [
         (
-          (
-            { config, ... }:
-            {
-              options = presetOptionTypes // {
-                servers = mkOption {
-                  type = types.attrsOf (types.submodule mcpServerOptionsType);
-                  default = { };
-                  description = lib.mdDoc "Custom MCP server configurations";
-                };
+          _:
+          {
+            options = presetOptionTypes // {
+              servers = mkOption {
+                type = types.attrsOf (types.submodule mcpServerOptionsType);
+                default = { };
+                description = lib.mdDoc "Custom MCP server configurations";
               };
-            }
-          )
+            };
+          }
         )
       ];
     };

@@ -16,13 +16,15 @@ let
   mcpServerOptionsType = import ./nix/lib/mcp-server-options.nix lib;
 
   # Helper to transform a simple preset definition into a full module
+  # NOTE: Uses toolName instead of command to avoid IFD during option definition.
+  # The actual command path is resolved lazily inside config = mkIf config.enable.
   mkPresetModule =
     {
       name,
       description ? "MCP integration for ${name}",
       options ? { },
       env ? (_: { }),
-      command,
+      toolName,
       args ? (_: [ ]),
     }:
     { config, ... }:
@@ -41,9 +43,10 @@ let
       config = mkIf config.enable {
         mcpServer = {
           type = "stdio";
-          inherit command;
+          # Resolve tool path lazily here (only when enabled) to avoid IFD during evaluation
+          command = tools.getToolPath toolName;
           args = args config;
-          env = builtins.mapAttrs (k: v: builtins.toString v) (env config);
+          env = builtins.mapAttrs (_k: v: builtins.toString v) (env config);
         };
       };
     };
@@ -53,7 +56,7 @@ let
 
     asana = {
       name = "Asana";
-      command = tools.getToolPath "asana";
+      toolName = "asana";
       env = config: {
         ASANA_ACCESS_TOKEN_FILEPATH = config.tokenFilepath;
       };
@@ -68,7 +71,8 @@ let
 
     filesystem = {
       name = "Filesystem";
-      command = tools.getToolPath "filesystem";
+      description = "Read, write, and list files within allowed directories. Use for file operations in sandboxed paths.";
+      toolName = "filesystem";
       args = config: config.allowedPaths;
       options = {
         allowedPaths = mkOption {
@@ -81,17 +85,21 @@ let
 
     git = {
       name = "Git";
-      command = tools.getToolPath "git";
-      env = config: {
+      description = "Execute git operations: status, diff, log, blame, show, commit. Use instead of shell git commands.";
+      toolName = "git";
+      env = _config: {
         # Reset PYTHONPATH to avoid environmental dependencies affecting the runtime
         # of this application.
         PYTHONPATH = "";
+        # GitPython requires the git binary to be available in PATH
+        PATH = lib.makeBinPath [ pkgs.git ];
       };
     };
 
     fetch = {
       name = "Fetch";
-      command = tools.getToolPath "fetch";
+      description = "Fetch and parse web content from URLs. Use for documentation and external resources.";
+      toolName = "fetch";
       args =
         config:
         (lib.optionals (config.userAgent != null) [
@@ -103,7 +111,7 @@ let
           config.proxyURL
         ])
         ++ (lib.optionals config.ignoreRobotsTxt [ "--ignore-robots-txt" ]);
-      env = config: {
+      env = _config: {
         # Reset PYTHONPATH to avoid environmental dependencies affecting the runtime
         # of this application.
         PYTHONPATH = "";
@@ -132,19 +140,21 @@ let
 
     sequential-thinking = {
       name = "Sequential Thinking";
-      command = tools.getToolPath "sequential-thinking";
+      description = "Step-by-step reasoning for complex problem decomposition and multi-step planning.";
+      toolName = "sequential-thinking";
     };
 
     time = {
       name = "Time";
-      command = tools.getToolPath "time";
+      description = "Get current time and timezone information for time-sensitive operations.";
+      toolName = "time";
       args =
         config:
         lib.optionals (config.localTimezone != null) [
           "--local-timezone"
           config.localTimezone
         ];
-      env = config: {
+      env = _config: {
         # Reset PYTHONPATH to avoid environmental dependencies affecting the runtime
         # of this application.
         PYTHONPATH = "";
@@ -160,7 +170,7 @@ let
 
     github = {
       name = "GitHub";
-      command = tools.getToolPath "github";
+      toolName = "github";
       args = config: [
         "stdio"
         "--toolsets"
@@ -223,7 +233,7 @@ let
 
     grafana = {
       name = "Grafana";
-      command = tools.getToolPath "grafana";
+      toolName = "grafana";
       args =
         config:
         [
@@ -285,8 +295,8 @@ let
 
     buildkite = {
       name = "Buildkite";
-      command = tools.getToolPath "buildkite";
-      args = config: [ "stdio" ];
+      toolName = "buildkite";
+      args = _config: [ "stdio" ];
       env = config: {
         BUILDKITE_API_TOKEN_FILEPATH = config.apiKeyFilepath;
       };
@@ -301,7 +311,7 @@ let
 
     lsp-golang = {
       name = "LSP (Golang)";
-      command = tools.getToolPath "lsp";
+      toolName = "lsp";
       args = config: [
         "--workspace"
         config.workspace
@@ -362,14 +372,14 @@ let
 
     lsp-typescript = {
       name = "LSP (Typescript)";
-      command = tools.getToolPath "lsp";
+      toolName = "lsp";
       args = config: [
         "--workspace"
         config.workspace
         "--lsp"
         config.lspPackage.meta.mainProgram
       ];
-      env = config: {
+      env = _config: {
         PATH = lib.makeBinPath [ pkgs.typescript-language-server ];
       };
       options = {
@@ -390,7 +400,7 @@ let
 
     lsp-python = {
       name = "LSP (Python)";
-      command = tools.getToolPath "lsp";
+      toolName = "lsp";
       args = config: [
         "--workspace"
         config.workspace
@@ -422,7 +432,7 @@ let
 
     lsp-rust = {
       name = "LSP (Rust)";
-      command = tools.getToolPath "lsp";
+      toolName = "lsp";
       args = config: [
         "--workspace"
         config.workspace
@@ -452,7 +462,7 @@ let
 
     lsp-nix = {
       name = "LSP (Nix)";
-      command = tools.getToolPath "lsp";
+      toolName = "lsp";
       args = config: [
         "--workspace"
         config.workspace
@@ -482,9 +492,9 @@ let
 
     obsidian = {
       name = "Obsidian";
-      command = tools.getToolPath "obsidian";
+      toolName = "obsidian";
 
-      args = config: [ ];
+      args = _config: [ ];
 
       env = config: {
         OBSIDIAN_API_KEY_FILEPATH = config.apiKeyFilepath;
@@ -518,7 +528,7 @@ let
     ast-grep = {
       name = "ast-grep";
       description = "MCP server for ast-grep structural code search and transformation";
-      command = tools.getToolPath "ast-grep";
+      toolName = "ast-grep";
       args =
         config:
         lib.optionals (config.configFile != null) [
@@ -537,10 +547,45 @@ let
 
     nixos = {
       name = "NixOS";
-      command = tools.getToolPath "nixos";
+      description = "Query NixOS and Home Manager option documentation: types, defaults, descriptions, and examples.";
+      toolName = "nixos";
       args = _config: [ ];
       env = _config: { };
       options = { };
+    };
+
+    config-normalizer = {
+      name = "Config Normalizer";
+      description = "Converts config files (JSON/YAML/TOML/INI) to LLM-friendly XML";
+      toolName = "config-normalizer";
+      args = _config: [ ];
+      env = _config: { };
+      options = { };
+    };
+
+    flake-analyst = {
+      name = "Flake Analyst";
+      description = "Parses Nix flake.lock files into dependency reports";
+      toolName = "flake-analyst";
+      args = _config: [ ];
+      env = _config: { };
+      options = { };
+    };
+
+    code-intel = {
+      name = "Code Intel";
+      description = "Extracts code structure (classes, functions) via Tree-Sitter";
+      toolName = "code-intel";
+      args = _config: [ ];
+      env = _config: { };
+      options = {
+        languages = mkOption {
+          type = types.listOf (types.enum [ "python" "nix" "java" ]);
+          default = [ "python" "nix" "java" ];
+          description = lib.mdDoc "Languages to enable for code structure analysis";
+          example = [ "python" "nix" ];
+        };
+      };
     };
 
   };

@@ -8,6 +8,7 @@
   fetchFromGitHub,
   buildNpmPackage,
   nodejs,
+  nodejs_22,
   nodePackages,
   python311,
   symlinkJoin,
@@ -98,6 +99,8 @@ let
     };
 
   # todo: remove once/if shx is in pkgs.nodePackages
+  # Note: shx is pinned to nodejs_22 for npm ci compatibility with newer Node.js versions.
+  # The npmFlags omit optional deps (like fsevents) that cause cross-platform issues.
   shx =
     let
       version = "7c2dd8ce765ffb6b42964c9d8541706829487c90";
@@ -111,8 +114,10 @@ let
         rev = version;
         hash = "sha256-QGq6WqjozgU9AxosDyTe7wrl+sulccxIN9AohoS+Zc0=";
       };
+      nodejs = nodejs_22;
       dontNpmBuild = true;
       npmDepsHash = "sha256-R1fn1TH4FntPnMd40AUGYIPLSZX18sQ7fKzTU3zSEd0=";
+      npmFlags = ["--omit=optional"];
       meta = with lib; {
         description = "Portable Shell Commands for Node";
         homepage = "https://github.com/shelljs/shx";
