@@ -91,5 +91,10 @@ in
         };
       }
     ) { } (attrNames enabledPresetServers);
+
+    # Write MCP server config for Claude Code to read
+    files.".mcp.json".text = builtins.toJSON {
+      mcpServers = config.claude.code.mcpServers;
+    };
   };
 }
